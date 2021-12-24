@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "incremental": true,
+    "module": "commonjs",
+    "outDir": "dist",
+    "skipLibCheck": true,
+    "target": "ES6"
+  },
+  "include": ["src"]
+}
