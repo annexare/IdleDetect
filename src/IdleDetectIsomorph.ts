@@ -1,20 +1,19 @@
-import { IdleDetect, defaultEventTypes, defaultOnInactive } from './IdleDetect'
+import { IdleDetect, defaultEventTypes, defaultOnIdle } from './IdleDetect'
 
 export const isIdleDetectorSupported = () => 'IdleDetector' in window
 
 export class IdleDetectIsomorph extends IdleDetect {
-  protected isIdleDetectorAPI = false
-
   // Native API
-  private controller: AbortController = null
-  private detector: IdleDetector = null
+  protected controller?: AbortController = null
+  protected detector?: IdleDetector = null
 
   constructor(
-    seconds: number,
-    onInactive: () => void = defaultOnInactive,
+    idleSeconds: number,
+    onInactive: () => void = defaultOnIdle,
     eventTypes: string[] = defaultEventTypes,
+    enableLogs = false,
   ) {
-    super(seconds, onInactive, eventTypes)
+    super(idleSeconds, onInactive, eventTypes, enableLogs)
 
     if (isIdleDetectorSupported()) {
       this.controller = new AbortController()
@@ -24,34 +23,38 @@ export class IdleDetectIsomorph extends IdleDetect {
   cleanupAndStop = () => {
     super.cleanupAndStop()
 
-    if (this.detector) {
-      this.detector = null
-    }
+    // Need to check if it's fine with next start()
+    // this.controller.abort()
+    this.detector = null
+
+    this.log('IdleDetector: Inactive')
   }
 
   handleIdleChange = () => {
-    const userState = this.detector.userState
-    const screenState = this.detector.screenState
+    const userState = this.detector?.userState
+    const screenState = this.detector?.screenState
 
-    console.info(`IdleDetector change: ${userState}, ${screenState}`)
+    this.log(`IdleDetector: User is ${userState}, screen is ${screenState}`)
 
-    if (userState === 'idle' || screenState === 'locked') {
-      this.handleInactive()
+    if (userState === UserIdleState.idle || screenState === ScreenIdleState.locked) {
+      this.handleIdle()
     }
   }
 
   startIdleDetector = async () => {
+    this.log('IdleDetect: startIdleDetector()')
+
     if (!this.detector) {
       this.detector = new window.IdleDetector()
       this.detector.addEventListener('change', this.handleIdleChange)
     }
 
     await this.detector.start({
-      threshold: this.inactivityTime,
+      threshold: this.idleTime,
       signal: this.controller.signal,
     })
 
-    console.info('IdleDetector is active')
+    this.log('IdleDetector: Active')
   }
 
   start = async () => {
@@ -59,15 +62,14 @@ export class IdleDetectIsomorph extends IdleDetect {
     this.cleanupAndStop()
 
     // Check if native API can be used
-    this.isIdleDetectorAPI =
-      isIdleDetectorSupported() && (await window.IdleDetector.requestPermission()) === 'granted'
-
-    if (this.isIdleDetectorAPI) {
-      console.error('Idle detection permission denied.')
-
-      return this.startIdleDetector()
-    } else {
-      this.startTimeout()
+    if (isIdleDetectorSupported()) {
+      if ((await window.IdleDetector.requestPermission()) === 'granted') {
+        return this.startIdleDetector()
+      } else {
+        this.error('IdleDetector: Permission denied')
+      }
     }
+
+    return this.startTimeout()
   }
 }
