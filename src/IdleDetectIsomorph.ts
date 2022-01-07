@@ -1,4 +1,4 @@
-import { IdleDetect, defaultEventTypes, defaultOnIdle } from './IdleDetect'
+import { IdleDetect, defaultEventTypes, defaultNoop } from './IdleDetect'
 
 export const isIdleDetectorSupported = () => 'IdleDetector' in window
 
@@ -8,12 +8,14 @@ export class IdleDetectIsomorph extends IdleDetect {
   protected detector?: IdleDetector = null
 
   constructor(
+    /** Number of seconds for idle detection, 15 minutes by default */
     idleSeconds: number,
-    onInactive: () => void = defaultOnIdle,
-    eventTypes: string[] = defaultEventTypes,
+    /** Event handler when user is idle for specified time */
+    onIdle: () => void = defaultNoop,
     enableLogs = false,
+    eventTypes: string[] = defaultEventTypes,
   ) {
-    super(idleSeconds, onInactive, eventTypes, enableLogs)
+    super(idleSeconds, onIdle, enableLogs, eventTypes)
 
     if (isIdleDetectorSupported()) {
       this.controller = new AbortController()
@@ -58,10 +60,6 @@ export class IdleDetectIsomorph extends IdleDetect {
   }
 
   start = async () => {
-    // Cleanup
-    this.cleanupAndStop()
-
-    // Check if native API can be used
     if (isIdleDetectorSupported()) {
       if ((await window.IdleDetector.requestPermission()) === 'granted') {
         return this.startIdleDetector()

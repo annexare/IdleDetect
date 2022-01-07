@@ -1,8 +1,8 @@
-export const defaultEventTypes = ['click', 'mousedown', 'touchstart', 'keypress']
+export const defaultEventTypes = ['mousedown', 'touchstart', 'keypress']
 /** 15 minutes by default */
 export const defaultIdleTime = 15 * 60 * 1000
 export const defaultNoLog: (...messages: any[]) => void = () => {}
-export const defaultOnIdle: () => void = () => {}
+export const defaultNoop: () => void = () => {}
 
 export class IdleDetect {
   /** List of tracket event types, bubbled to `window` and used for timeout */
@@ -10,7 +10,7 @@ export class IdleDetect {
   /** Idle timeout in milliseconds */
   public idleTime = defaultIdleTime
   /** Event handler when user is idle for specified time */
-  public handleIdle: () => void = defaultOnIdle
+  public handleIdle: () => void = defaultNoop
 
   protected timeout?: number
 
@@ -19,14 +19,14 @@ export class IdleDetect {
 
   constructor(
     /** Number of seconds for idle detection, 15 minutes by default */
-    idleSeconds: number,
+    idleSeconds: number = defaultIdleTime,
     /** Event handler when user is idle for specified time */
-    onIdle: () => void = defaultOnIdle,
-    eventTypes: string[] = defaultEventTypes,
+    onIdle: () => void = defaultNoop,
     enableLogs = false,
+    eventTypes: string[] = defaultEventTypes,
   ) {
     this.eventTypes = eventTypes
-    this.idleTime = idleSeconds * 1000 || defaultIdleTime
+    this.setIdleTime(idleSeconds)
     this.handleIdle = onIdle
     this.setLogs(enableLogs)
   }
@@ -36,18 +36,24 @@ export class IdleDetect {
     window.clearTimeout(this.timeout)
 
     for (const eventType of this.eventTypes) {
-      window.removeEventListener(eventType, this.resetTimeout)
+      window.removeEventListener(eventType, this.redoTimeout)
     }
   }
 
   // [perf] Use debounce here?
-  resetTimeout = () => {
-    this.log('IdleDetect: resetTimeout()')
+  redoTimeout = () => {
+    this.log('IdleDetect: redoTimeout()')
     window.clearTimeout(this.timeout)
+
     this.timeout = window.setTimeout(() => {
       this.cleanupAndStop()
       this.handleIdle()
     }, this.idleTime)
+  }
+
+  setIdleTime = (idleSeconds: number = defaultIdleTime) => {
+    this.log('IdleDetect: setIdleTime()', idleSeconds)
+    this.idleTime = idleSeconds * 1000
   }
 
   setLogs = (enableLogs = false) => {
@@ -65,15 +71,19 @@ export class IdleDetect {
 
     // Event listeners
     for (const eventType of this.eventTypes) {
-      window.addEventListener(eventType, this.resetTimeout)
+      window.addEventListener(eventType, this.redoTimeout)
     }
 
     // Reset
-    this.resetTimeout()
+    this.redoTimeout()
   }
 
   start = () => {
-    this.cleanupAndStop()
+    if (!this.idleTime) {
+      this.error('IdleDetect: idleTime is must be a positive number to start')
+      return
+    }
+
     this.startTimeout()
   }
 }

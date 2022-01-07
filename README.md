@@ -14,11 +14,11 @@ import IdleDetect from 'idle-detect'
 const onInactive = () => {
   console.info('User is inactive now')
 }
-const timer = new IdleDetect(15 * 60, onInactive)
+const idleDetect = new IdleDetect(15 * 60, onInactive)
 
 // Start timer, e.g. when user is logged in
-timer.start()
+idleDetect.start()
 
 // End timer, e.g. when user is logged out
-timer.cleanupAndStop()
+idleDetect.cleanupAndStop()
 ```
