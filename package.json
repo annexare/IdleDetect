@@ -2,13 +2,13 @@
   "name": "idle-detect",
   "version": "0.1.0",
   "description": "A TypeScript library for inactivity timer, which utilises `IdleDetector` API where possible or a fallback to `window.setTimeout` approach",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "build": "npx tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "files": [
-    "lib"
+    "dist"
   ],
   "repository": {
     "type": "git",
