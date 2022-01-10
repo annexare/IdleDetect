@@ -10,6 +10,8 @@ npm install idle-detect
 
 ```ts
 import IdleDetect from 'idle-detect'
+// Or, if you don't want to use still experimental IdleDetector API:
+// import { IdleDetect } from 'idle-detect/dist/IdleDetect'
 
 const onInactive = () => {
   console.info('User is inactive now')

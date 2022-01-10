@@ -1,4 +1,4 @@
-import { IdleDetect, defaultEventTypes, defaultNoop } from './IdleDetect'
+import { IdleDetect, defaultEventTypes, defaultIdleTime, defaultNoop } from './IdleDetect'
 
 export const isIdleDetectorSupported = () => 'IdleDetector' in window
 
@@ -9,7 +9,7 @@ export class IdleDetectIsomorph extends IdleDetect {
 
   constructor(
     /** Number of seconds for idle detection, 15 minutes by default */
-    idleSeconds: number,
+    idleSeconds: number = defaultIdleTime,
     /** Event handler when user is idle for specified time */
     onIdle: () => void = defaultNoop,
     enableLogs = false,
