@@ -7,13 +7,13 @@
 
 declare global {
   enum UserIdleState {
-    'active' = 'active',
-    'idle' = 'idle',
+    active = 'active',
+    idle = 'idle',
   }
 
   enum ScreenIdleState {
-    'locked' = 'locked',
-    'unlocked' = 'unlocked',
+    locked = 'locked',
+    unlocked = 'unlocked',
   }
 
   interface IdleDetector {

@@ -17,12 +17,16 @@ export class IdleDetect {
   public error: (...messages: any[]) => void = defaultNoLog
   public log: (...messages: any[]) => void = defaultNoLog
 
+  /**
+   * @param idleSeconds Number of seconds for idle detection, 15 minutes by default
+   * @param onIdle Event handler when user is idle for specified time
+   * @param enableLogs
+   * @param eventTypes
+   */
   constructor(
-    /** Number of seconds for idle detection, 15 minutes by default */
     idleSeconds: number = defaultIdleTime,
-    /** Event handler when user is idle for specified time */
     onIdle: () => void = defaultNoop,
-    enableLogs = false,
+    enableLogs: boolean = false,
     eventTypes: string[] = defaultEventTypes,
   ) {
     this.eventTypes = eventTypes

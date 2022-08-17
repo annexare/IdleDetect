@@ -2,15 +2,29 @@ import { IdleDetect, defaultEventTypes, defaultIdleTime, defaultNoop } from './I
 
 export const isIdleDetectorSupported = () => 'IdleDetector' in window
 
+export enum UserIdleState {
+  active = 'active',
+  idle = 'idle',
+}
+
+export enum ScreenIdleState {
+  locked = 'locked',
+  unlocked = 'unlocked',
+}
+
 export class IdleDetectIsomorph extends IdleDetect {
   // Native API
   protected controller?: AbortController = null
   protected detector?: IdleDetector = null
 
+  /**
+   * @param idleSeconds Number of seconds for idle detection, 15 minutes by default
+   * @param onIdle Event handler when user is idle for specified time
+   * @param enableLogs
+   * @param eventTypes
+   */
   constructor(
-    /** Number of seconds for idle detection, 15 minutes by default */
     idleSeconds: number = defaultIdleTime,
-    /** Event handler when user is idle for specified time */
     onIdle: () => void = defaultNoop,
     enableLogs = false,
     eventTypes: string[] = defaultEventTypes,
