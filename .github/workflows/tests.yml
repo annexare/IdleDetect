@@ -13,7 +13,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [16.x]
+        node-version: [18.x]
 
     steps:
     - uses: actions/checkout@v3
@@ -26,4 +26,3 @@ jobs:
       uses: cypress-io/github-action@v4
       with:
         build: npm run build
-        start: npm start
