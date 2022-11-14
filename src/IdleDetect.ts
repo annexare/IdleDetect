@@ -35,7 +35,7 @@ export class IdleDetect {
     this.setLogs(enableLogs)
   }
 
-  cleanupAndStop = () => {
+  cleanupAndStop() {
     this.log('IdleDetect: cleanupAndStop()')
     window.clearTimeout(this.timeout)
 

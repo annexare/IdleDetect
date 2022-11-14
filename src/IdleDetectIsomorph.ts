@@ -75,13 +75,23 @@ export class IdleDetectIsomorph extends IdleDetect {
 
   start = async () => {
     if (isIdleDetectorSupported()) {
-      if ((await window.IdleDetector.requestPermission()) === 'granted') {
-        return this.startIdleDetector()
+      let permission = ''
+
+      try {
+        permission = await window.IdleDetector.requestPermission()
+      } catch (e) {}
+
+      if (permission === 'granted') {
+        this.startIdleDetector()
+
+        // Do not start the Timeout fallback
+        return
       } else {
         this.error('IdleDetector: Permission denied')
       }
     }
 
-    return this.startTimeout()
+    // Start the Timeout fallback
+    this.startTimeout()
   }
 }
