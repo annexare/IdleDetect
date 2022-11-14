@@ -1,5 +1,7 @@
 # Idle Detect
 
+[![IdleDetect Tests](https://github.com/annexare/IdleDetect/actions/workflows/tests.yml/badge.svg)](https://github.com/annexare/IdleDetect/actions/workflows/tests.yml)
+
 A TypeScript library for inactivity timer, which utilises [IdleDetector API](https://developer.mozilla.org/en-US/docs/Web/API/IdleDetector) where possible or a fallback to `window.setTimeout` approach.
 
 ## Usage
